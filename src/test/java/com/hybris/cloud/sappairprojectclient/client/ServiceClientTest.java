@@ -82,4 +82,26 @@ class ServiceClientTest {
         assertEquals("Service 1", result.getName());
         assertEquals("1", result.getId());
     }
+
+    @Test
+    void testWithCustomBaseUrl() {
+        // Arrange - Set a different base URL for this test
+        String customBaseUrl = "https://staging-api.example.com";
+        ReflectionTestUtils.setField(serviceClient, "baseUrl", customBaseUrl);
+
+        Service mockService = new Service("1", "Custom Service", "Custom Description", "ACTIVE", "1.0");
+        ResponseEntity<Service> mockResponse = new ResponseEntity<>(mockService, HttpStatus.OK);
+
+        // Note: The expected URL now uses the custom base URL
+        when(restTemplate.getForEntity(eq(customBaseUrl + "/api/v1/services/1"), eq(Service.class)))
+                .thenReturn(mockResponse);
+
+        // Act
+        Service result = serviceClient.getServiceById("1");
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Custom Service", result.getName());
+        assertEquals("1", result.getId());
+    }
 }
